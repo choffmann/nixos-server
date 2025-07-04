@@ -23,9 +23,25 @@
   sops.defaultSopsFile = ../../secrets/matrix-server.yaml;
   sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
   sops.secrets."passwords/root".neededForUsers = true;
+  sops.secrets."passwords/db/matrix-synapse" = {
+    owner = "postgres";
+    restartUnits = ["postgresql-setup-password.service" "matrix-synapse.service"];
+  };
   sops.secrets."homeserver.yaml" = {
     owner = "matrix-synapse";
     restartUnits = ["matrix-synapse.service"];
+  };
+
+  systemd.services."postgresql-setup-password" = {
+    script = ''
+      ${pkgs.postgresql}/bin/psql -c "ALTER USER \"matrix-synapse\" PASSWORD '$(cat ${config.sops.secrets."passwords/db/matrix-synapse".path})';"
+    '';
+    unitConfig = {
+      Requires = "postgresql-setup.service";
+    };
+    serviceConfig = {
+      User = "postgres";
+    };
   };
 
   environment.systemPackages = map lib.lowPrio [
