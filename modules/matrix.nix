@@ -55,6 +55,19 @@ in {
         locations."/_synapse/client".proxyPass = "http://[::1]:8008";
         locations."/_synapse/admin".proxyPass = "http://[::1]:8008";
       };
+      "element.${fqdn}" = {
+        enableACME = true;
+        forceSSL = true;
+        serverAliases = [
+          "element.${config.networking.domain}"
+        ];
+
+        root = pkgs.element-web.override {
+          conf = {
+            default_server_config = clientConfig;
+          };
+        };
+      };
     };
   };
 
