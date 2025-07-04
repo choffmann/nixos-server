@@ -1,0 +1,11 @@
+keys:
+  - &users:
+    - &choffmann age1mvm3yv2tw7d6neus8hkefdhny9ja4qyzk229vpzhhd3wc6nr8c8sqev2st
+  - &hosts:
+    - &matrix-server age1dahzszjay6wpfh6x5zp86wrh0wgk4lyw3v5p5wmnz64qk8r20gvqa48kej
+creation_rules:
+  - path_regex: secrets/.*.yaml$
+    key_groups:
+      - age:
+          - *choffmann
+          - *matrix-server
