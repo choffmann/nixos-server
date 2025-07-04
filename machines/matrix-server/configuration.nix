@@ -2,6 +2,7 @@
   modulesPath,
   lib,
   pkgs,
+  config,
   ...
 } @ args: {
   imports = [
@@ -21,7 +22,7 @@
 
   sops.defaultSopsFile = ../../secrets/matrix-server.yaml;
   sops.age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-  sops.secrets.foo = {};
+  sops.secrets."passwords/root".neededForUsers = true;
   sops.secrets."homeserver.yaml" = {
     owner = "matrix-synapse";
     restartUnits = ["matrix-synapse.service"];
@@ -36,8 +37,7 @@
   networking.hostName = "matrix";
   networking.domain = "homebin.dev";
 
-  users.users.root.password = "1234";
-  users.users.root.hashedPasswordFile = null;
+  users.users.root.hashedPasswordFile = config.sops.secrets."passwords/root".path;
   users.users.root.openssh.authorizedKeys.keys =
     [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJw08ayERLCtV3iZtTRnGWLNJzPyGdfUUm3LUYbDPXT6 choffmann"
